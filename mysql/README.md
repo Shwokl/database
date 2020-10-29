@@ -255,7 +255,7 @@ The default muscle groups are:
 ## Exercises
 | id                   | name    | description | notes   | icon | muscle_group_id | category_id |
 | :------------------: | :-----: | :---------: | :-----: | :--: | :-------------: | :---------: |
-| INTEGER, PRIMARY KEY | VARCHAR | VARCHAR     | VARCHAR | BLOB | FOREIGN KEY     | FOREIGN KEY |
+| INTEGER, PRIMARY KEY | VARCHAR | VARCHAR     | VARCHAR | VARCHAR | FOREIGN KEY     | FOREIGN KEY |
 
 ### Description
 This table stores all the exercises that are available.
@@ -283,15 +283,13 @@ As for muscle groups, any deletion will cause an invalid reference for the forei
 3. `category_id` can NOT be `null`
 
 > ***NOTE***  
-> The field `muscle_group_id` CAN be `null`, but it never SHOULD be. See [above](#data-integrity) for an overview of how data integrity is preserved in the case of a muscle group deletion  
-> 
-> The `icon` is converted to a `BLOB` and uploaded directly to the database. As of right now, no CDN system is in place.
+> The field `muscle_group_id` CAN be `null`, but it never SHOULD be. See [above](#data-integrity) for an overview of how data integrity is preserved in the case of a muscle group deletion
 
 
 ## Users
 | id                   | name    | username | password | email   | role_id | avatar | is_active | active_workout_plan_id |
 | :------------------: | :-----: | :------: | :------: | :-----: | :-----: | :----: | :-------: | :--------------------: |
-| INTEGER, PRIMARY KEY | VARCHAR | VARCHAR  | VARCHAR  | VARCHAR | INTEGER | BLOB   | BOOL      | INTEGER                |
+| INTEGER, PRIMARY KEY | VARCHAR | VARCHAR  | VARCHAR  | VARCHAR | INTEGER | VARCHAR   | BOOL      | INTEGER                |
 
 ### Description
 This table keeps track of all the users registered to the app. 
@@ -387,7 +385,7 @@ This access level only allows the user to view the plan and that's it. They can 
 ## Workout Plans
 | id                   | name    | description | image | creator_id | is_public | default_access_level_id |
 | :------------------: | :-----: | :---------: | :---: | :--------: | :-------: | :---------------------: |
-| INTEGER, PRIMARY KEY | VARCHAR | VARCHAR     | BLOB  | INTEGER    | BOOL      | INTEGER                 |
+| INTEGER, PRIMARY KEY | VARCHAR | VARCHAR     | VARCHAR  | INTEGER    | BOOL      | INTEGER                 |
 
 ### Description
 This table keeps track of all the workout plans known to the app, regardless of the user who created them or who has access to what, and some basic sharing-related fields.
