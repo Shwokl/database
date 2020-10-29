@@ -1,3 +1,7 @@
+# Table of Contents
+1. [Installation Instructions](#how-to-deploy)
+2. [Database Architecture](#database-overview)
+
 # How to deploy
 
 ## MySQL / MariaDB
