@@ -174,5 +174,5 @@ INSERT INTO `roles`(`name`, `is_locked`) VALUES ('Admin', true), ('User', true),
 INSERT INTO `workout_plan_access_levels`(`name`) VALUES ('Plan Manager'), ('Plan Member'), ('Plan Viewer');
 INSERT INTO `categories`(`name`) VALUES ('Weight and Repetitions'), ('Distance and Time'), ('Repetitions'), ('Time');
 INSERT INTO `muscle_groups`(`name`, `is_locked`) VALUES ('None', true), ('Quadriceps', true), ('Hamstrings', true), ('Calves', true), ('Chest', true), ('Back', true), ('Shoulders', true), ('Biceps', true), ('Triceps', true), ('Forearms', true), ('Trapezius', true), ('Abs', true), ('Cardio', true);
-INSERT INTO `users`(`username`, `name`, `password`, `email`, `role_id`) VALUES ('admin', 'Administrator', 'admin', 'admin@example.com', 1);
+INSERT INTO `users`(`username`, `name`, `password`, `email`, `role_id`) VALUES ('admin', 'Administrator', '$2b$12$hIkYTq4roh2P6Py4WfbO9On2/wrRXUIC0mVSYcjqsSUSMegUNOzYC', 'admin@example.com', 1);
 INSERT INTO `settings`(`option`, `value`, `changed_by`, `changed_on`) VALUES ('api_token', '', 'god', NOW());
