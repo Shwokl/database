@@ -287,9 +287,9 @@ As for muscle groups, any deletion will cause an invalid reference for the forei
 
 
 ## Users
-| id                   | name    | username | password | email   | role_id | avatar | is_active | active_workout_plan_id |
-| :------------------: | :-----: | :------: | :------: | :-----: | :-----: | :----: | :-------: | :--------------------: |
-| INTEGER, PRIMARY KEY | VARCHAR | VARCHAR  | VARCHAR  | VARCHAR | INTEGER | VARCHAR   | BOOL      | INTEGER                |
+| id                   | name    | username | password | spice   |email    | role_id | avatar  | is_active | active_workout_plan_id |
+| :------------------: | :-----: | :------: | :------: | :-----: | :-----: | :-----: | :-----: | :-------: | :--------------------: |
+| INTEGER, PRIMARY KEY | VARCHAR | VARCHAR  | VARCHAR  | VARCHAR | VARCHAR | INTEGER | VARCHAR | BOOL      | INTEGER                |
 
 ### Description
 This table keeps track of all the users registered to the app. 
