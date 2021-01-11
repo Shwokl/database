@@ -1,4 +1,4 @@
---- CREATE TABLES
+# --- CREATE TABLES
 DROP TABLE IF EXISTS `roles`;
 CREATE TABLE `roles`(
     `role_id` INTEGER PRIMARY KEY AUTO_INCREMENT,
@@ -115,7 +115,7 @@ CREATE TABLE `settings`(
     `changed_on` DATE DEFAULT NULL
 );
 
---- CREATE FOREIGN KEYS
+# --- CREATE FOREIGN KEYS
 ALTER TABLE `exercises`
     ADD CONSTRAINT `FK_exercise_has_category` 
         FOREIGN KEY (`exercise_category_id`) 
@@ -200,7 +200,7 @@ ALTER TABLE `exercise_workout_map`
         ON DELETE CASCADE
         ON UPDATE CASCADE;
 
---- INSERT DEFAULT DATA
+# --- INSERT DEFAULT DATA
 INSERT INTO `roles`(`role_name`, `role_is_locked`)
 VALUES  ('Admin',   true), 
         ('User',    true),
@@ -233,6 +233,6 @@ VALUES  ('None',        true),
         ('Cardio',      true);
 
 --- DEFAULT LOGIN: admin | Adm!n1strat0r
-INSERT INTO `users`(`user_username`, `user_name`, `user_password`, 'user_spice',`user_email`, `user_role_id`) 
+INSERT INTO `users`(`user_username`, `user_name`, `user_password`, `user_spice`,`user_email`, `user_role_id`) 
 VALUES ('admin', 'Administrator', '$2b$10$o1OFi19.5xil8.bmqBg0EuFZVl6U9Y9OX1YiN4oD6Q8N5EyT9RF02', '$2b$10$o1OFi19.5xil8.bmqBg0Eu', 'admin@example.com', 1);
 
