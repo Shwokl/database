@@ -1,2 +1,2 @@
-# Shwokl
-A Self Hosted Workout Log ... a SHWOKL one might say
+# Shwokl/database
+The database configuration for the Shwokl application.
