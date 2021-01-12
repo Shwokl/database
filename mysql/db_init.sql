@@ -27,7 +27,7 @@ CREATE TABLE `exercises`(
     `exercise_notes` VARCHAR(1024) DEFAULT NULL,
     `exercise_icon` VARCHAR(256) DEFAULT NULL,
     `exercise_muscle_group_id` INTEGER DEFAULT 1,
-    `exercise_category_id` INTEGER
+    `exercise_category_id` INTEGER DEFAULT 1
 );
 
 DROP TABLE IF EXISTS `users`;
