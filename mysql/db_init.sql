@@ -38,7 +38,7 @@ CREATE TABLE `users`(
     `user_password` VARCHAR(128) NOT NULL,
     `user_spice` VARCHAR(128) NOT NULL,
     `user_email` VARCHAR(128) UNIQUE NOT NULL,
-    `user_role_id` INTEGER,
+    `user_role_id` INTEGER DEFAULT 2,
     `user_avatar` VARCHAR(256) DEFAULT NULL,
     `user_is_active` BOOLEAN DEFAULT TRUE,
     `user_workout_plan_id` INTEGER DEFAULT NULL
