@@ -1,4 +1,4 @@
---- CREATE TABLES
+# ---- CREATE TABLES
 DROP TABLE IF EXISTS `roles`;
 CREATE TABLE `roles`(
     `role_id` INTEGER PRIMARY KEY AUTO_INCREMENT,
@@ -23,11 +23,11 @@ DROP TABLE IF EXISTS `exercises`;
 CREATE TABLE `exercises`(
     `exercise_id` INTEGER PRIMARY KEY AUTO_INCREMENT,
     `exercise_name` VARCHAR(128) UNIQUE NOT NULL,
-    `exercise_description` VARCHAR(512) DEFAULT NULL,
-    `exercise_notes` VARCHAR(1024) DEFAULT NULL,
-    `exercise_icon` VARCHAR(256) DEFAULT NULL,
-    `exercise_muscle_group_id` INTEGER DEFAULT 1,
-    `exercise_category_id` INTEGER
+    `exercise_description` VARCHAR(512) DEFAULT "",
+    `exercise_notes` VARCHAR(1024) DEFAULT "",
+    `exercise_icon` VARCHAR(256) DEFAULT "/path/to/default/exercise/icon/here",
+    `muscle_group_id` INTEGER DEFAULT 1,
+    `category_id` INTEGER DEFAULT 1
 );
 
 DROP TABLE IF EXISTS `users`;
@@ -38,17 +38,17 @@ CREATE TABLE `users`(
     `user_password` VARCHAR(128) NOT NULL,
     `user_spice` VARCHAR(128) NOT NULL,
     `user_email` VARCHAR(128) UNIQUE NOT NULL,
-    `user_role_id` INTEGER,
+    `role_id` INTEGER,
     `user_avatar` VARCHAR(256) DEFAULT NULL,
     `user_is_active` BOOLEAN DEFAULT TRUE,
-    `user_workout_plan_id` INTEGER DEFAULT NULL
+    `workout_plan_id` INTEGER DEFAULT NULL
 );
 
 DROP TABLE IF EXISTS `workouts`;
 CREATE TABLE `workouts`(
     `workout_id` INTEGER PRIMARY KEY AUTO_INCREMENT,
     `workout_name` VARCHAR(128) NOT NULL,
-    `workout_workout_plan_id` INTEGER NOT NULL
+    `workout_plan_id` INTEGER NOT NULL
 );
 
 DROP TABLE IF EXISTS `workout_plan_access_levels`;
@@ -63,15 +63,15 @@ CREATE TABLE `workout_plans`(
     `workout_plan_name` VARCHAR(128) NOT NULL,
     `workout_plan_description` VARCHAR(512) DEFAULT NULL,
     `workout_plan_image` VARCHAR(256) DEFAULT NULL,
-    `workout_plan_creator_id` INTEGER NOT NULL,
+    `creator_id` INTEGER NOT NULL,
     `workout_plan_is_public` BOOLEAN NOT NULL DEFAULT FALSE,
-    `workout_plan_default_access_level_id` INTEGER NOT NULL DEFAULT 3
+    `default_access_level_id` INTEGER NOT NULL DEFAULT 3
 );
 
 DROP TABLE IF EXISTS `workout_logs`;
 CREATE TABLE `workout_logs`(
     `workout_log_id` INTEGER PRIMARY KEY AUTO_INCREMENT,
-    `workout_log_user_id` INTEGER,
+    `user_id` INTEGER,
     `workout_log_name` VARCHAR(128) NOT NULL,
     `workout_log_date` DATE NOT NULL DEFAULT NOW(),
     `workout_log_duration` INTEGER NOT NULL,
@@ -81,7 +81,7 @@ CREATE TABLE `workout_logs`(
 DROP TABLE IF EXISTS `log_entries`;
 CREATE TABLE `log_entries`(
     `log_entry_id` INTEGER PRIMARY KEY AUTO_INCREMENT,
-    `log_entry_workout_log_id` INTEGER NOT NULL,
+    `workout_log_id` INTEGER NOT NULL,
     `log_entry_exercise_name` VARCHAR(128) NOT NULL,
     `log_entry_exercise_category_id` INTEGER NOT NULL,
     `log_entry_set_number` INTEGER NOT NULL,
@@ -115,59 +115,59 @@ CREATE TABLE `settings`(
     `changed_on` DATE DEFAULT NULL
 );
 
---- CREATE FOREIGN KEYS
+# ---- CREATE FOREIGN KEYS
 ALTER TABLE `exercises`
     ADD CONSTRAINT `FK_exercise_has_category` 
-        FOREIGN KEY (`exercise_category_id`) 
+        FOREIGN KEY (`category_id`) 
         REFERENCES `categories`(`category_id`) 
         ON DELETE SET NULL
         ON UPDATE CASCADE,
     ADD CONSTRAINT `FK_exercise_has_muscle_group` 
-        FOREIGN KEY (`exercise_muscle_group_id`) 
+        FOREIGN KEY (`muscle_group_id`) 
         REFERENCES `muscle_groups`(`muscle_group_id`)
         ON DELETE SET NULL
         ON UPDATE CASCADE;
     
 ALTER TABLE `users`
     ADD CONSTRAINT `FK_user_has_role` 
-        FOREIGN KEY (`user_role_id`) 
+        FOREIGN KEY (`role_id`) 
         REFERENCES `roles`(`role_id`)
         ON DELETE SET NULL
         ON UPDATE CASCADE,
     ADD CONSTRAINT `FK_user_has_active_workout_plan` 
-        FOREIGN KEY (`user_workout_plan_id`) 
+        FOREIGN KEY (`workout_plan_id`) 
         REFERENCES `workout_plans`(`workout_plan_id`)
         ON DELETE SET NULL
         ON UPDATE CASCADE;
 
 ALTER TABLE `workouts`
     ADD CONSTRAINT `FK_workout_has_workout_plan` 
-        FOREIGN KEY (`workout_workout_plan_id`) 
+        FOREIGN KEY (`workout_plan_id`) 
         REFERENCES `workout_plans`(`workout_plan_id`)
         ON DELETE CASCADE
         ON UPDATE CASCADE;
 
 ALTER TABLE `workout_plans`
     ADD CONSTRAINT `FK_workout_plan_has_creator` 
-        FOREIGN KEY (`workout_plan_creator_id`) 
+        FOREIGN KEY (`creator_id`) 
         REFERENCES `users`(`user_id`)
         ON DELETE CASCADE
         ON UPDATE CASCADE,
     ADD CONSTRAINT `FK_workout_plan_has_default_access` 
-        FOREIGN KEY (`workout_plan_default_access_level_id`) 
+        FOREIGN KEY (`default_access_level_id`) 
         REFERENCES `workout_plan_access_levels`(`access_level_id`)
         ON UPDATE CASCADE;
 
 ALTER TABLE `workout_logs`
     ADD CONSTRAINT `FK_workout_log_has_user` 
-        FOREIGN KEY (`workout_log_user_id`) 
+        FOREIGN KEY (`user_id`) 
         REFERENCES `users`(`user_id`)
         ON DELETE CASCADE
         ON UPDATE CASCADE;
 
 ALTER TABLE `log_entries`
     ADD CONSTRAINT `FK_log_entry_has_log_parent` 
-        FOREIGN KEY (`log_entry_workout_log_id`) 
+        FOREIGN KEY (`workout_log_id`) 
         REFERENCES `workout_logs`(`workout_log_id`)
         ON DELETE CASCADE
         ON UPDATE CASCADE;
@@ -200,7 +200,7 @@ ALTER TABLE `exercise_workout_map`
         ON DELETE CASCADE
         ON UPDATE CASCADE;
 
---- INSERT DEFAULT DATA
+# ---- INSERT DEFAULT DATA
 INSERT INTO `roles`(`role_name`, `role_is_locked`)
 VALUES  ('Admin',   true), 
         ('User',    true),
@@ -232,7 +232,7 @@ VALUES  ('None',        true),
         ('Abs',         true), 
         ('Cardio',      true);
 
---- DEFAULT LOGIN: admin | Adm!n1strat0r
-INSERT INTO `users`(`user_username`, `user_name`, `user_password`, 'user_spice',`user_email`, `user_role_id`) 
+# ---- DEFAULT LOGIN: admin | Adm!n1strat0r
+INSERT INTO `users`(`user_username`, `user_name`, `user_password`, `user_spice`,`user_email`, `role_id`) 
 VALUES ('admin', 'Administrator', '$2b$10$o1OFi19.5xil8.bmqBg0EuFZVl6U9Y9OX1YiN4oD6Q8N5EyT9RF02', '$2b$10$o1OFi19.5xil8.bmqBg0Eu', 'admin@example.com', 1);
 
