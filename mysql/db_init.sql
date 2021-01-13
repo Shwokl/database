@@ -1,13 +1,8 @@
-<<<<<<< HEAD
-# ---- CREATE TABLES
-=======
-# --- CREATE TABLES
->>>>>>> 0bc8bf9fc02c7a794d59b75a41e3bf0e183aa8d0
+# ---- CREATE TABLES ----
 DROP TABLE IF EXISTS `roles`;
 CREATE TABLE `roles`(
     `role_id` INTEGER PRIMARY KEY AUTO_INCREMENT,
-    `role_name` VARCHAR(32) UNIQUE NOT NULL,
-    `role_is_locked` BOOLEAN NOT NULL DEFAULT FALSE
+    `role_name` VARCHAR(32) UNIQUE NOT NULL
 );
 
 DROP TABLE IF EXISTS `categories`;
@@ -19,8 +14,7 @@ CREATE TABLE `categories`(
 DROP TABLE IF EXISTS `muscle_groups`;
 CREATE TABLE `muscle_groups`(
     `muscle_group_id` INTEGER PRIMARY KEY AUTO_INCREMENT,
-    `muscle_group_name` VARCHAR(32) UNIQUE NOT NULL,
-    `muscle_group_is_locked` BOOLEAN NOT NULL DEFAULT FALSE
+    `muscle_group_name` VARCHAR(32) UNIQUE NOT NULL
 );
 
 DROP TABLE IF EXISTS `exercises`;
@@ -30,8 +24,14 @@ CREATE TABLE `exercises`(
     `exercise_description` VARCHAR(512) DEFAULT "",
     `exercise_notes` VARCHAR(1024) DEFAULT "",
     `exercise_icon` VARCHAR(256) DEFAULT "/path/to/default/exercise/icon/here",
-    `muscle_group_id` INTEGER DEFAULT 1,
-    `category_id` INTEGER DEFAULT 1
+    `category_id` INTEGER NOT NULL
+);
+
+DROP TABLE IF EXISTS `exercises_muscle_groups_map`;
+CREATE TABLE `exercises_muscle_groups_map`(
+    PRIMARY KEY(`exercise_id`, `muscle_group_id`),
+    `exercise_id` INTEGER NOT NULL,
+    `muscle_group_id` INTEGER NOT NULL
 );
 
 DROP TABLE IF EXISTS `users`;
@@ -41,56 +41,50 @@ CREATE TABLE `users`(
     `user_username` VARCHAR(64) NOT NULL,
     `user_password` VARCHAR(128) NOT NULL,
     `user_spice` VARCHAR(128) NOT NULL,
-    `user_email` VARCHAR(128) UNIQUE NOT NULL,
+    `user_email` VARCHAR(128) DEFAULT NULL,
     `role_id` INTEGER,
-    `user_avatar` VARCHAR(256) DEFAULT NULL,
-    `user_is_active` BOOLEAN DEFAULT TRUE,
-    `workout_plan_id` INTEGER DEFAULT NULL
+    `user_avatar` VARCHAR(256) DEFAULT "/path/to/default/user/icon/here",
+    `user_is_active` BOOLEAN DEFAULT TRUE
 );
 
 DROP TABLE IF EXISTS `workouts`;
 CREATE TABLE `workouts`(
     `workout_id` INTEGER PRIMARY KEY AUTO_INCREMENT,
     `workout_name` VARCHAR(128) NOT NULL,
+	`workout_image` VARCHAR(256) DEFAULT "/path/to/default/workout/icon/here",
     `workout_plan_id` INTEGER NOT NULL
-);
-
-DROP TABLE IF EXISTS `workout_plan_access_levels`;
-CREATE TABLE `workout_plan_access_levels`(
-    `access_level_id` INTEGER PRIMARY KEY AUTO_INCREMENT,
-    `access_level_name` VARCHAR(64) UNIQUE NOT NULL
 );
 
 DROP TABLE IF EXISTS `workout_plans`;
 CREATE TABLE `workout_plans`(
     `workout_plan_id` INTEGER PRIMARY KEY AUTO_INCREMENT,
     `workout_plan_name` VARCHAR(128) NOT NULL,
-    `workout_plan_description` VARCHAR(512) DEFAULT NULL,
-    `workout_plan_image` VARCHAR(256) DEFAULT NULL,
+    `workout_plan_description` VARCHAR(512) DEFAULT "",
+    `workout_plan_image` VARCHAR(256) DEFAULT "/path/to/default/workout_plan/icon/here",
     `creator_id` INTEGER NOT NULL,
-    `workout_plan_is_public` BOOLEAN NOT NULL DEFAULT FALSE,
-    `default_access_level_id` INTEGER NOT NULL DEFAULT 3
+    `workout_plan_is_public` BOOLEAN NOT NULL DEFAULT FALSE
 );
 
 DROP TABLE IF EXISTS `workout_logs`;
 CREATE TABLE `workout_logs`(
     `workout_log_id` INTEGER PRIMARY KEY AUTO_INCREMENT,
-    `user_id` INTEGER,
+    `user_id` INTEGER NOT NULL,
     `workout_log_name` VARCHAR(128) NOT NULL,
     `workout_log_date` DATE NOT NULL DEFAULT NOW(),
     `workout_log_duration` INTEGER NOT NULL,
-    `workout_log_notes` VARCHAR(512) DEFAULT NULL
+    `workout_log_notes` VARCHAR(512) DEFAULT ""
 );
 
 DROP TABLE IF EXISTS `log_entries`;
 CREATE TABLE `log_entries`(
     `log_entry_id` INTEGER PRIMARY KEY AUTO_INCREMENT,
     `workout_log_id` INTEGER NOT NULL,
-    `log_entry_exercise_name` VARCHAR(128) NOT NULL,
-    `log_entry_exercise_category_id` INTEGER NOT NULL,
-    `log_entry_set_number` INTEGER NOT NULL,
-    `log_entry_data_1` INTEGER NOT NULL,
-    `log_entry_data_2` INTEGER DEFAULT 0
+    `exercise_name` VARCHAR(128) NOT NULL,
+    `muscle_group_id` INTEGER NOT NULL,
+    `category_id` INTEGER NOT NULL,
+    `set_number` INTEGER NOT NULL,
+    `data_1` INTEGER NOT NULL,
+    `data_2` INTEGER DEFAULT 0
 );
 
 DROP TABLE IF EXISTS `user_workout_plan_map`;
@@ -98,7 +92,7 @@ CREATE TABLE `user_workout_plan_map`(
     PRIMARY KEY(`user_id`, `workout_plan_id`),
     `user_id` INTEGER NOT NULL,
     `workout_plan_id` INTEGER NOT NULL,
-    `access_level_id` INTEGER NOT NULL
+    `is_primary` BOOLEAN DEFAULT FALSE
 );
 
 DROP TABLE IF EXISTS `exercise_workout_map`;
@@ -106,43 +100,29 @@ CREATE TABLE `exercise_workout_map`(
     PRIMARY KEY(`exercise_id`, `workout_id`),
     `exercise_id` INTEGER NOT NULL,
     `workout_id` INTEGER NOT NULL,
-    `sets` INTEGER NOT NULL,
-    `data_1_target` INTEGER DEFAULT 0
+    `sets` INTEGER NOT NULL
 );
 
-DROP TABLE IF EXISTS `settings`;
-CREATE TABLE `settings`(
-    `id` INTEGER PRIMARY KEY AUTO_INCREMENT,
-    `option` VARCHAR(64) NOT NULL UNIQUE,
-    `value` VARCHAR(64) NOT NULL,
-    `changed_by` VARCHAR(64) NOT NULL,
-    `changed_on` DATE DEFAULT NULL
-);
-
-# ---- CREATE FOREIGN KEYS
+# ---- CREATE FOREIGN KEYS ----
 ALTER TABLE `exercises`
-    ADD CONSTRAINT `FK_exercise_has_category` 
-        FOREIGN KEY (`category_id`) 
-        REFERENCES `categories`(`category_id`) 
-        ON DELETE SET NULL
-        ON UPDATE CASCADE,
-    ADD CONSTRAINT `FK_exercise_has_muscle_group` 
-        FOREIGN KEY (`muscle_group_id`) 
-        REFERENCES `muscle_groups`(`muscle_group_id`)
-        ON DELETE SET NULL
-        ON UPDATE CASCADE;
+    ADD CONSTRAINT `FK_exercise_has_category`
+        FOREIGN KEY (`category_id`)
+        REFERENCES `categories`(`category_id`);
     
 ALTER TABLE `users`
     ADD CONSTRAINT `FK_user_has_role` 
         FOREIGN KEY (`role_id`) 
-        REFERENCES `roles`(`role_id`)
-        ON DELETE SET NULL
-        ON UPDATE CASCADE,
-    ADD CONSTRAINT `FK_user_has_active_workout_plan` 
-        FOREIGN KEY (`workout_plan_id`) 
-        REFERENCES `workout_plans`(`workout_plan_id`)
-        ON DELETE SET NULL
-        ON UPDATE CASCADE;
+        REFERENCES `roles`(`role_id`);
+
+ALTER TABLE `exercises_muscle_groups_map`
+	ADD CONSTRAINT `FK_exercises_muscle_groups_map_has_exercise`
+		FOREIGN KEY (`exercise_id`)
+		REFERENCES `exercises`(`exercise_id`)
+		ON UPDATE CASCADE
+		ON DELETE CASCADE,
+	ADD CONSTRAINT `FK_exercises_muscle_groups_map_has_muscle_group`
+		FOREIGN KEY (`muscle_group_id`)
+		REFERENCES `muscle_groups`(`muscle_group_id`);
 
 ALTER TABLE `workouts`
     ADD CONSTRAINT `FK_workout_has_workout_plan` 
@@ -156,10 +136,6 @@ ALTER TABLE `workout_plans`
         FOREIGN KEY (`creator_id`) 
         REFERENCES `users`(`user_id`)
         ON DELETE CASCADE
-        ON UPDATE CASCADE,
-    ADD CONSTRAINT `FK_workout_plan_has_default_access` 
-        FOREIGN KEY (`default_access_level_id`) 
-        REFERENCES `workout_plan_access_levels`(`access_level_id`)
         ON UPDATE CASCADE;
 
 ALTER TABLE `workout_logs`
@@ -174,6 +150,16 @@ ALTER TABLE `log_entries`
         FOREIGN KEY (`workout_log_id`) 
         REFERENCES `workout_logs`(`workout_log_id`)
         ON DELETE CASCADE
+        ON UPDATE CASCADE,
+    ADD CONSTRAINT `FK_log_entry_has_category` 
+        FOREIGN KEY (`category_id`) 
+        REFERENCES `categories`(`category_id`)
+        ON DELETE CASCADE
+        ON UPDATE CASCADE,
+    ADD CONSTRAINT `FK_log_entry_has_muscle_group` 
+        FOREIGN KEY (`muscle_group_id`) 
+        REFERENCES `muscle_groups`(`muscle_group_id`)
+        ON DELETE CASCADE
         ON UPDATE CASCADE;
 
 ALTER TABLE `user_workout_plan_map`
@@ -186,10 +172,6 @@ ALTER TABLE `user_workout_plan_map`
         FOREIGN KEY (`workout_plan_id`) 
         REFERENCES `workout_plans`(`workout_plan_id`)
         ON DELETE CASCADE
-        ON UPDATE CASCADE,
-    ADD CONSTRAINT `FK_user_plan_map_has_access_level` 
-        FOREIGN KEY (`access_level_id`) 
-        REFERENCES `workout_plan_access_levels`(`access_level_id`)
         ON UPDATE CASCADE;
 
 ALTER TABLE `exercise_workout_map`
@@ -204,39 +186,31 @@ ALTER TABLE `exercise_workout_map`
         ON DELETE CASCADE
         ON UPDATE CASCADE;
 
-# ---- INSERT DEFAULT DATA
-INSERT INTO `roles`(`role_name`, `role_is_locked`)
-VALUES  ('Admin',   true), 
-        ('User',    true),
-        ('Guest',   true);
-
-INSERT INTO `workout_plan_access_levels`(`access_level_name`) 
-VALUES  ('Plan Manager'), 
-        ('Plan Member'),
-        ('Plan Viewer');
+# ---- INSERT DEFAULT DATA ----
+INSERT INTO `roles`(`role_name`)
+VALUES  ('Admin'), ('User'), ('Guest');
 
 INSERT INTO `categories`(`category_name`) 
-VALUES  ('Weight and Repetitions'), 
-        ('Distance and Time'), 
-        ('Repetitions'), 
-        ('Time');
+VALUES  ('Weight and Repetitions'), ('Distance and Time'), ('Repetitions'), ('Time');
 
-INSERT INTO `muscle_groups`(`muscle_group_name`, `muscle_group_is_locked`)
-VALUES  ('None',        true), 
-        ('Quadriceps',  true), 
-        ('Hamstrings',  true), 
-        ('Calves',      true), 
-        ('Chest',       true), 
-        ('Back',        true), 
-        ('Shoulders',   true), 
-        ('Biceps',      true), 
-        ('Triceps',     true), 
-        ('Forearms',    true), 
-        ('Trapezius',   true), 
-        ('Abs',         true), 
-        ('Cardio',      true);
+INSERT INTO `muscle_groups`(`muscle_group_name`)
+VALUES  ('None'),
+        ('Quadriceps'),
+        ('Hamstrings'),
+        ('Calves'),
+        ('Chest'),
+        ('Back'),
+        ('Shoulders'),
+        ('Biceps'),
+        ('Triceps'),
+        ('Forearms'),
+        ('Trapezius'),
+        ('Abs'),
+        ('Cardio');
 
-# ---- DEFAULT LOGIN: admin | Adm!n1strat0r
+# ---- DEFAULT LOGIN: admin | Adm!n1strat0r ----
 INSERT INTO `users`(`user_username`, `user_name`, `user_password`, `user_spice`,`user_email`, `role_id`) 
 VALUES ('admin', 'Administrator', '$2b$10$o1OFi19.5xil8.bmqBg0EuFZVl6U9Y9OX1YiN4oD6Q8N5EyT9RF02', '$2b$10$o1OFi19.5xil8.bmqBg0Eu', 'admin@example.com', 1);
 
+INSERT INTO `workout_plans` (`workout_plan_name`, `workout_plan_description`, `creator_id`, `workout_plan_is_public`)
+VALUES ('Ungrouped', 'Individual workouts', 1, true);
