@@ -1,4 +1,8 @@
+<<<<<<< HEAD
 # ---- CREATE TABLES
+=======
+# --- CREATE TABLES
+>>>>>>> 0bc8bf9fc02c7a794d59b75a41e3bf0e183aa8d0
 DROP TABLE IF EXISTS `roles`;
 CREATE TABLE `roles`(
     `role_id` INTEGER PRIMARY KEY AUTO_INCREMENT,
