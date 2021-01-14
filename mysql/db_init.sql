@@ -80,7 +80,6 @@ CREATE TABLE `log_entries`(
     `log_entry_id` INTEGER PRIMARY KEY AUTO_INCREMENT,
     `workout_log_id` INTEGER NOT NULL,
     `exercise_name` VARCHAR(128) NOT NULL,
-    `muscle_group_id` INTEGER NOT NULL,
     `category_id` INTEGER NOT NULL,
     `set_number` INTEGER NOT NULL,
     `data_1` INTEGER NOT NULL,
@@ -154,11 +153,6 @@ ALTER TABLE `log_entries`
     ADD CONSTRAINT `FK_log_entry_has_category` 
         FOREIGN KEY (`category_id`) 
         REFERENCES `categories`(`category_id`)
-        ON DELETE CASCADE
-        ON UPDATE CASCADE,
-    ADD CONSTRAINT `FK_log_entry_has_muscle_group` 
-        FOREIGN KEY (`muscle_group_id`) 
-        REFERENCES `muscle_groups`(`muscle_group_id`)
         ON DELETE CASCADE
         ON UPDATE CASCADE;
 
